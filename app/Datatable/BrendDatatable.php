@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Datatable;
+
+use App\Models\Entities\Brend;
+use Illuminate\Database\Eloquent\Builder;
+
+class BrendDatatable extends BaseDatatable
+{
+    public function __construct()
+    {
+        parent::__construct(Brend::class, [
+            'id'             => 'ID',
+            'title'          => 'Ad',
+            'statusview'     => 'Status',
+            'created_at'     => 'Yaradılma tarixi'
+        ], [
+            [
+                'title' => 'Əməliyyatlar',
+                'type'  => "functional",
+                'view'  => function ($item) {
+                    return
+                        delete_btn($item->id, Brend::class) .
+                        edit_btn(route("gopanel.brends.updateOrSave", $item->id), $item->id, ['class' => ['edit-template']]);
+                }
+            ]
+        ]);
+    }
+
+    protected function query(): Builder
+    {
+        $query =  $this->baseQueryScope();
+        if($this->getSearchInput()){
+            $searchInput = strtolower($this->getSearchInput());
+            $query->whereHas('translations', function($q) use ($searchInput) {
+                $q->whereRaw('LOWER(value) LIKE ?', ['%' . $searchInput . '%']);
+            });
+        }
+        return $query;
+    }
+
+
+}

@@ -1,0 +1,39 @@
+<form id="saveForm" action="{{$route}}" enctype="multipart/form-data">
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        @foreach($languages as $lang)
+            <li class="nav-item" role="presentation">
+                <button @class(['nav-link', 'active'=>$loop->index==0]) id="{{$lang->locale}}-tab" data-bs-toggle="tab" data-bs-target="#{{$lang->locale}}" type="button" role="tab" aria-controls="{{$lang->locale}}" aria-selected="true">
+                    {{$lang->locale}}
+                </button>
+            </li>
+        @endforeach
+    </ul>
+
+
+    @foreach($languages as $lang)
+        <div  @class(['tab-pane','fade', 'show'=>$loop->index==0, 'active'=>$loop->index==0, 'mt-4']) id="{{$lang->locale}}" role="tabpanel" aria-labelledby="{{$lang->locale}}-tab">
+            <div class="mb-3">
+                <label for="category-name" class="form-label">Başlıq ({{$lang->locale}})</label>
+                <input type="text" class="form-control" id="category-name" name="title[{{$lang->locale}}]" value="{{$item->getTranslation('title', $lang->locale)}}" placeholder="Başlıq daxil edin">
+            </div>
+{{--            <div class="mb-3">--}}
+{{--                <label for="category-name" class="form-label">Haqqında ({{$lang->locale}})</label>--}}
+{{--                <input type="text" class="form-control" id="category-name" name="subtitle[{{$lang->locale}}]" value="{{$item->getTranslation('subtitle', $lang->locale)}}" placeholder="Haqqında daxil edin">--}}
+{{--            </div>--}}
+        </div>
+    @endforeach
+    <div class="mb-3">
+        <label for="category-name" class="form-label">Url</label>
+        <input type="text" class="form-control" id="category-name" name="url" placeholder="Urli daxil edin" value="{{ $item->url }}">
+    </div>
+    <div class="mb-3">
+        <label for="category-name" class="form-label">Şəkil</label>
+        <input type="file" class="form-control" id="category-name" name="icon" >
+        @if($item->icon)
+        <a href="/storage/{{$item->icon}}" target="_blank">
+            <img src="/storage/{{$item->icon}}" alt="" width="200" style="object-fit: cover" height="100" class="mt-1">
+        </a>
+        @endif
+    </div>
+</form>
