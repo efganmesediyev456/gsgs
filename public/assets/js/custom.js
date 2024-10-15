@@ -1,19 +1,19 @@
 $(function() {
-    $(".filterSelect").on("change", function() {
-        var value = $(this).val();
-        var currentUrl = window.location.href;
-        var newUrl;
-        if (currentUrl.indexOf('?filter=') !== -1 || currentUrl.indexOf('&filter=') !== -1) {
-            newUrl = currentUrl.replace(/(\?|&)filter=[^&]+/, '$1filter=' + value);
-        } else {
-            if (currentUrl.indexOf('?') === -1) {
-                newUrl = currentUrl + '?filter=' + value;
-            } else {
-                newUrl = currentUrl + '&filter=' + value;
-            }
-        }
-        window.location.href = newUrl;
-    });
+    // $(".filterSelect").on("change", function() {
+    //     var value = $(this).val();
+    //     var currentUrl = window.location.href;
+    //     var newUrl;
+    //     if (currentUrl.indexOf('?filter=') !== -1 || currentUrl.indexOf('&filter=') !== -1) {
+    //         newUrl = currentUrl.replace(/(\?|&)filter=[^&]+/, '$1filter=' + value);
+    //     } else {
+    //         if (currentUrl.indexOf('?') === -1) {
+    //             newUrl = currentUrl + '?filter=' + value;
+    //         } else {
+    //             newUrl = currentUrl + '&filter=' + value;
+    //         }
+    //     }
+    //     window.location.href = newUrl;
+    // });
 
     $.ajaxSetup({
         headers: {
@@ -147,6 +147,37 @@ function endLoading() {
 
 
 $(function () {
+
+
+
+
+
+
+    var sliderrange = $('#slider-range');
+    var amountprice = $('#amount');
+
+    $(function () {
+        sliderrange.slider({
+            range: true,
+            min: $min,
+            max: 1000,
+            values: [0, $max],
+            slide: function (event, ui) {
+                amountprice.val(ui.values[0] + " AZN" + " - " + ui.values[1] + " AZN");
+            },
+            stop: function (event, ui) {
+                filterAjax();
+            }
+        });
+
+        amountprice.val(
+            sliderrange.slider("values", 0) + " AZN" +
+            " - " + sliderrange.slider("values", 1) + " AZN"
+        );
+    });
+
+
+
     setTimeout(function () {
         $(".with-ul a i").click(function (e) {
             if($(this).parent().siblings('ul').hasClass('show')){
@@ -160,9 +191,8 @@ $(function () {
 
 
 
-
-    $('#products_filter').on('change', 'input[type="checkbox"]', function() {
-        var formData = $('#products_filter').serialize();
+    function filterAjax(){
+        var formData = $('#products_filter').serialize()+'&min='+sliderrange.slider("values", 0)+"&max="+sliderrange.slider("values", 1);
         startLoading()
         $.ajax({
             url: '/products/filter',
@@ -173,21 +203,21 @@ $(function () {
                 $("#productList").html(response.products)
                 $("#parameterList").html(response.parameters)
                 endLoading();
-                setTimeout(function () {
-                    $(".with-ul a i").click(function (e) {
-                        if($(this).parent().siblings('ul').hasClass('show')){
-                            $(this).parent().find('i.fas').addClass('fa-plus').removeClass('fa-minus');
-                        }else{
-                            $(this).parent().find('i.fas').addClass('fa-minus').removeClass('fa-plus');
-                        }
-                        $(this).parent().siblings('ul').toggleClass('show');
-                    });
-                }, 500);
+                history.pushState(null, '', response.url);
             },
             error: function(xhr, status, error) {
 
             }
         });
+    }
+
+    $(".filterButton").click(function (e){
+        e.preventDefault()
+        filterAjax()
+    })
+
+    $('#products_filter').on('change', 'input[type="checkbox"]', function() {
+        filterAjax()
     });
 
     $('body').on("click", '.widget-title-next', function (e) {

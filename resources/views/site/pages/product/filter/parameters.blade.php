@@ -1,22 +1,12 @@
 @foreach($parameters->map(function ($item){return $item->parent;})->unique()->sortBy(function($item){return $item->title;}) as $parameter)
-    <div class="widget widget-collapsible widget-categories">
-
-        <h3 class="widget-title @if(!in_array($parameter->id, $selectedParametersParent->toArray()))  collapsed @endif widget-title-next"><span>{{$parameter->title}}</span>
-        <span class="toggle-btn"></span>
-        </h3>
-        <div class="brend_list widget-body" id="brendList" >
-
-            @foreach($parameter->children as $child)
-                @if($parameters->where('id', $child->id)->count())
-                    <div class="brend_item">
-                        <label for="parameter_{{$child->id}}">
-                            <input @checked($selectedParameters && in_array($child->id, $selectedParameters))  id="parameter_{{$child->id}}" class="brend-checkbox" type="checkbox" name="parameter[]" value="{{$child->id}}" >
-                            {{ $child->title }}
-                        </label>
-                    </div>
-                @endif
-            @endforeach
-
-        </div>
+    <label class="fw-900 mt-15">{{$parameter->title}}</label>
+    <div class="custome-checkbox">
+        @foreach($parameter->children as $child)
+            @if($parameters->where('id', $child->id)->count())
+                <input @checked(request()->parameter and in_array($child->id, request()->parameter)) class="form-check-input" type="checkbox" name="parameter[]" id="parameter_{{$child->id}}" value="{{$child->id}}">
+                <label class="form-check-label" for="parameter_{{$child->id}}"><span> {{ $child->title }} ({{$child->products()->count()}})</span></label>
+                <br>
+            @endif
+        @endforeach
     </div>
 @endforeach

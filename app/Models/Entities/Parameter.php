@@ -39,6 +39,11 @@ class Parameter extends Model
         return $this->belongsTo(Parameter::class, 'parent_id');
     }
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class);
+    }
+
     protected static function boot()
     {
         parent::boot();

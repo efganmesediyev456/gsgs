@@ -61,15 +61,14 @@
         <div class="container">
             <div class="header-wrap">
                 <div class="logo header_logo">
-                    <a href="index.html">
-                        <img src="./assets/imgs/logo/logo-removebg-preview.png" alt="Cartridge Baku Logo">
-                        <!-- <img src="assets/imgs/theme/logo.svg" alt="logo"> -->
+                    <a href="/{{app()->getLocale()}}">
+                        <img src="{{ get_image($mainsetting->logo) }}" alt="Cartridge Baku Logo">
                     </a>
                 </div>
                 <div class="header-right">
                     <div class="search-style-2">
-                        <form method="get" action="/{{app()->getLocale()}}/search">
-                            <select class="select-active">
+                        <form method="get" action="/{{app()->getLocale()}}/products">
+                            <select name="category" class="select-active">
                                 <option value="">{{ __('frontend.category_search') }}</option>
                                 @foreach($categories as $category)
                                     <option @selected($category->slug==request()->category) value="{{ $category->slug }}">{{ $category->title }}</option>
@@ -90,8 +89,8 @@
         <div class="container">
             <div class="header-wrap header-space-between position-relative">
                 <div class="logo d-block d-lg-none header_mobile_logo">
-                    <a href="index.html">
-                        <img src="./assets/imgs/logo/logo-removebg-preview.png" alt="Cartridge Baku Logo">
+                    <a href="/{{app()->getLocale()}}">
+                        <img src="{{ get_image($mainsetting->logo) }}" alt="Cartridge Baku Logo">
                         <!-- <img src="assets/imgs/theme/logo.svg" alt="logo"> -->
                     </a>
                 </div>

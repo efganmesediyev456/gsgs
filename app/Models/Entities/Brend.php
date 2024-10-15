@@ -19,4 +19,9 @@ class Brend extends Model
     {
         return $this->title;
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

@@ -30,6 +30,10 @@
     @include('site.inc.footer_js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $min = {{request()->min ?? 0}}
+        $max = {{request()->max ?? 1000}}
+    </script>
     <script src="{{ asset('/assets/js/custom.js?v='.time()) }}"></script>
 
 </body>

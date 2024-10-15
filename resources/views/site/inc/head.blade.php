@@ -61,5 +61,6 @@
 
 <link rel="stylesheet" href="{{asset('assets/css/main.css')}}?v={{time()}}">
 <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}?v={{time()}}">
+<link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}?v={{time()}}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 

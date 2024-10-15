@@ -187,7 +187,7 @@
     });
 
 
-    
+
     /*Carausel 4 columns*/
     $(".carausel-4-columns").each(function (key, item) {
         var id = $(this).attr("id");
@@ -419,21 +419,7 @@
     /*---------------------
         Price range
     --------------------- */
-    var sliderrange = $('#slider-range');
-    var amountprice = $('#amount');
-    $(function () {
-        sliderrange.slider({
-            range: true,
-            min: 16,
-            max: 400,
-            values: [0, 300],
-            slide: function (event, ui) {
-                amountprice.val("$" + ui.values[0] + " - $" + ui.values[1]);
-            }
-        });
-        amountprice.val("$" + sliderrange.slider("values", 0) +
-            " - $" + sliderrange.slider("values", 1));
-    });
+
 
     /*-------------------------------
         Sort by active
@@ -442,9 +428,11 @@
         var $body = $('body'),
             $cartWrap = $('.sort-by-product-area'),
             $cartContent = $cartWrap.find('.sort-by-dropdown');
-        $cartWrap.on('click', '.sort-by-product-wrap', function (e) {
+        $(document).on('click', '.sort-by-product-wrap', function (e) {
             e.preventDefault();
             var $this = $(this);
+
+            // Dropdown menüsünü aç/kapat
             if (!$this.parent().hasClass('show')) {
                 $this.siblings('.sort-by-dropdown').addClass('show').parent().addClass('show');
             } else {

@@ -1,0 +1,4 @@
+.pagination-area .page-item:last-child .page-link {
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+}

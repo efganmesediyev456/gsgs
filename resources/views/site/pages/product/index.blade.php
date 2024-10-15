@@ -5,14 +5,14 @@
             <div class="container">
                 <div class="breadcrumb">
                     <a href="/{{app()->getLocale()}}">{{ __('frontend.home_page') }}</a>
-                    <span></span> {{ __('frontend.products_page') }}
+                    <span></span>  {{ $category ? $category->title : __('frontend.products_page') }}
                 </div>
             </div>
         </div>
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row flex-row-reverse">
-                    <div class="col-lg-9">
+                    <div class="col-lg-9" id="productList">
                         <div class="shop-product-fillter">
                             <div class="totall-product"><p> @lang('frontend.we_found') <strong class="text-brand">{{$items->count().' '}}</strong>@lang('frontend.items_for_you')</p></div>
                             <div class="sort-by-product-area">
@@ -22,16 +22,16 @@
                                             <span><i class="fi-rs-apps"></i>@lang('frontend.filter_show'):</span>
                                         </div>
                                         <div class="sort-by-dropdown-wrap">
-                                            <span> 50 <i class="fi-rs-angle-small-down"></i></span>
+                                            <span> {{ $limit }} <i class="fi-rs-angle-small-down"></i></span>
                                         </div>
                                     </div>
                                     <div class="sort-by-dropdown">
                                         <ul>
-                                            <li><a class="active" href="#">50</a></li>
-                                            <li><a href="#">100</a></li>
-                                            <li><a href="#">150</a></li>
-                                            <li><a href="#">200</a></li>
-                                            <li><a href="#">All</a></li>
+                                            <li><a class="@if($limit == 50) active @endif" href="{{ route('site.products.index',array_merge(Arr::except(request()->query(), ['page']),['limit'=>50, 'language'=>app()->getLocale()])) }}">50</a></li>
+                                            <li><a class="@if($limit == 100) active @endif" href="{{ route('site.products.index',array_merge(Arr::except(request()->query(), ['page']),['limit'=>100, 'language'=>app()->getLocale()])) }}">100</a></li>
+                                            <li><a class="@if($limit == 150) active @endif" href="{{ route('site.products.index',array_merge(Arr::except(request()->query(), ['page']),['limit'=>150, 'language'=>app()->getLocale()])) }}">150</a></li>
+                                            <li><a class="@if($limit == 200) active @endif" href="{{ route('site.products.index',array_merge(Arr::except(request()->query(), ['page']),['limit'=>200, 'language'=>app()->getLocale()])) }}">200</a></li>
+                                            <li><a class="@if($limit == 'all') active @endif" href="{{ route('site.products.index',array_merge(Arr::except(request()->query(), ['page']),['limit'=>'all', 'language'=>app()->getLocale()])) }}">All</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -41,55 +41,82 @@
                                             <span><i class="fi-rs-apps-sort"></i>@lang('frontend.filter_sort_by'):</span>
                                         </div>
                                         <div class="sort-by-dropdown-wrap">
-                                            <span> Featured <i class="fi-rs-angle-small-down"></i></span>
+                                            <span> @lang('frontend.'.$orderby) <i class="fi-rs-angle-small-down"></i></span>
                                         </div>
                                     </div>
                                     <div class="sort-by-dropdown">
                                         <ul>
-                                            <li><a class="active" href="#">@lang('frontend.filter_featured')</a></li>
-                                            <li><a href="#">@lang('frontend.low_to_high')</a></li>
-                                            <li><a href="#">@lang('frontend.high_to_low')</a></li>
-                                            <li><a href="#">@lang('frontend.release_date')</a></li>
-                                            <li><a href="#">@lang('frontend.avg_rating')</a></li>
+                                            <li><a  class="@if($orderby=='filter_from_a_to_z') active @endif" href="{{ route('site.products.index',array_merge(Arr::except($_GET, ['page']),['filter'=>'filter_from_a_to_z', 'language'=>app()->getLocale()])) }}">@lang('frontend.filter_from_a_to_z')</a></li>
+                                            <li><a  class="@if($orderby=='filter_from_z_to_a') active @endif" href="{{ route('site.products.index',array_merge(Arr::except($_GET, ['page']),['filter'=>'filter_from_z_to_a', 'language'=>app()->getLocale()])) }}">@lang('frontend.filter_from_z_to_a')</a></li>
+                                            <li><a  class="@if($orderby=='filter_from_high_to_low') active @endif" href="{{ route('site.products.index',array_merge(Arr::except($_GET, ['page']),['filter'=>'filter_from_high_to_low', 'language'=>app()->getLocale() ])) }}">@lang('frontend.filter_from_high_to_low')</a></li>
+                                            <li><a  class="@if($orderby=='filter_from_low_to_high') active @endif" href="{{ route('site.products.index',array_merge(Arr::except($_GET, ['page']),['filter'=>'filter_from_low_to_high', 'language'=>app()->getLocale()])) }}">@lang('frontend.filter_from_low_to_high')</a></li>
+                                            <li><a  class="@if($orderby=='filter_mostly_viewed') active @endif" href="{{ route('site.products.index',array_merge(Arr::except($_GET, ['page']),['filter'=>'filter_mostly_viewed', 'language'=>app()->getLocale()])) }}">@lang('frontend.filter_mostly_viewed')</a></li>
+                                            <li><a  class="@if($orderby=='filter_latest_date') active @endif" href="{{ route('site.products.index',array_merge(Arr::except($_GET, ['page']),['filter'=>'filter_latest_date', 'language'=>app()->getLocale()])) }}">@lang('frontend.filter_latest_date')</a></li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row product-grid-3">
+                            @foreach($items as $product)
                             <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                                 <div class="product-cart-wrap mb-30">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img product-img-zoom">
-                                            <a href="shop-product-right.html">
-                                                <img class="default-img" src="../assets/imgs/cartridge/cartridge6-removebg-preview.png" alt="">
+                                            <a href="{{ product_slug($product->slug) }}">
+                                                <img class="default-img" src="{{ get_image($product->image) }}" alt="">
                                             </a>
                                         </div>
                                     </div>
                                     <div class="product-content-wrap">
                                         <div class="product-category">
-                                            <a href="shop-grid-right.html">Clothing</a>
+                                            <a href="{{ product_slug($product->slug) }}">{{ $product->title }}</a>
                                         </div>
-                                        <h2><a href="shop-product-right.html">Colorful Pattern Shirts</a></h2>
-                                        <div class="product-price">
-                                            <span>$238.85 </span>
-                                            <span class="old-price">$245.8</span>
-                                        </div>
+                                        <h2><a href="{{ product_slug($product->slug) }}">{{ $product->subtitle }}</a></h2>
+                                        @include('site.pages.inc.product_price', ['pro'=>$product])
                                     </div>
                                 </div>
                             </div>
+                            @endforeach
+
                         </div>
                         <!--pagination-->
                         <div class="pagination-area mt-45 mb-sm-5 mb-lg-0">
                             <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-start">
-                                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">16</a></li>
-                                    <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li>
+                                @if($limit != 'all' && method_exists($items, 'hasPages') && $items->hasPages())
+                                    <ul class="pagination justify-content-start">
+
+                                    @php
+                                        $totalPages = $items->lastPage();
+                                        $currentPage = $items->currentPage();
+                                        $start = max(1, $currentPage - 2);
+                                        $end = min($totalPages, $currentPage + 2);
+                                    @endphp
+                                    @if ($start > 1)
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $items->url(1) }}">1</a>
+                                        </li>
+                                        @if ($start > 2)
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        @endif
+                                    @endif
+
+                                    @for ($page = $start; $page <= $end; $page++)
+                                        <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
+                                            <a class="page-link" href="{{ $items->url($page) }}">{{ $page }}</a>
+                                        </li>
+                                    @endfor
+
+                                    @if ($end < $totalPages)
+                                        @if ($end < $totalPages - 1)
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        @endif
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $items->url($totalPages) }}">{{ $totalPages }}</a>
+                                        </li>
+                                    @endif
                                 </ul>
+                                @endif
                             </nav>
                         </div>
                     </div>
@@ -109,47 +136,55 @@
                         </div> -->
                         <!-- Fillter By Price -->
                         <div class="sidebar-widget price_range range mb-30">
-                            <div class="widget-header position-relative mb-20 pb-10">
-                                <h5 class="widget-title mb-10">@lang('frontend.fill_by_price')</h5>
-                                <div class="bt-1 border-color-1"></div>
-                            </div>
-                            <div class="price-filter">
-                                <div class="price-filter-inner">
-                                    <div id="slider-range"></div>
-                                    <div class="price_slider_amount">
-                                        <div class="label-input">
-                                            <span>@lang('frontend.filter_range'):</span><input type="text" id="amount" name="price" placeholder="Add Your Price" />
+                            <form action="" id="products_filter">
+                                <input type="hidden" name="limit" value="{{$limit}}">
+                                <input type="hidden" name="orderby" value="{{$orderby}}">
+                                <div class="widget-header position-relative mb-20 pb-10">
+                                    <h5 class="widget-title mb-10">@lang('frontend.fill_by_price')</h5>
+                                    <div class="bt-1 border-color-1"></div>
+                                </div>
+                                <div class="price-filter">
+                                    <div class="price-filter-inner">
+                                        <div id="slider-range"></div>
+                                        <div class="price_slider_amount">
+                                            <div class="label-input">
+                                                <span>@lang('frontend.filter_range'):</span>
+                                                <input type="text" id="amount" placeholder="Add Your Price" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="list-group">
-                                <div class="list-group-item mb-10 mt-10">
-                                    <label class="fw-900">Color</label>
-                                    <div class="custome-checkbox">
-                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
-                                        <label class="form-check-label" for="exampleCheckbox1"><span>Red (56)</span></label>
-                                        <br>
-                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox2" value="">
-                                        <label class="form-check-label" for="exampleCheckbox2"><span>Green (78)</span></label>
-                                        <br>
-                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox3" value="">
-                                        <label class="form-check-label" for="exampleCheckbox3"><span>Blue (54)</span></label>
-                                    </div>
-                                    <label class="fw-900 mt-15">Item Condition</label>
-                                    <div class="custome-checkbox">
-                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox11" value="">
-                                        <label class="form-check-label" for="exampleCheckbox11"><span>New (1506)</span></label>
-                                        <br>
-                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox21" value="">
-                                        <label class="form-check-label" for="exampleCheckbox21"><span>Refurbished (27)</span></label>
-                                        <br>
-                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox31" value="">
-                                        <label class="form-check-label" for="exampleCheckbox31"><span>Used (45)</span></label>
-                                    </div>
+                                <div class="list-group">
+                                        <div class="list-group-item mb-10 mt-10">
+                                            <label class="fw-900">@lang('frontend.all_brends')</label>
+                                            <div class="custome-checkbox" id="brendList">
+                                                @foreach($brends as $brend)
+                                                    <input class="form-check-input" @checked(request()->brend == $brend->id) type="checkbox" name="brend" id="brend_{{$brend->id}}" value="{{$brend->id}}">
+                                                    <label class="form-check-label" for="brend_{{$brend->id}}"><span>{{ $brend->title }} ({{$brend->products()->count()}})</span></label>
+                                                    <br>
+                                                @endforeach
+                                            </div>
+
+                                            <div id="parameterList">
+                                                @foreach($parameters->map(function ($item){return $item->parent;})->unique()->sortBy(function($item){return $item->title;}) as $parameter)
+                                                    <label class="fw-900 mt-15">{{$parameter->title}}</label>
+                                                    <div class="custome-checkbox">
+                                                        @foreach($parameter->children as $child)
+                                                            @if($parameters->where('id', $child->id)->count())
+                                                                <input @checked(request()->parameter and in_array($child->id, request()->parameter)) class="form-check-input" type="checkbox" name="parameter[]" id="parameter_{{$child->id}}" value="{{$child->id}}">
+                                                                <label class="form-check-label" for="parameter_{{$child->id}}"><span> {{ $child->title }} ({{$child->products()->count()}})</span></label>
+                                                                <br>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+
+
+                                        </div>
                                 </div>
-                            </div>
-                            <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> @lang('frontend.filter_button')</a>
+                            </form>
                         </div>
                         <!-- Product sidebar Widget -->
                         <div class="sidebar-widget product-sidebar  mb-30 p-30 bg-grey border-radius-10">
@@ -157,42 +192,18 @@
                                 <h5 class="widget-title mb-10">@lang('frontend.new_products')</h5>
                                 <div class="bt-1 border-color-1"></div>
                             </div>
+                            @foreach($latest_products as $product)
                             <div class="single-post clearfix">
                                 <div class="image">
-                                    <img src="assets/imgs/shop/thumbnail-3.jpg" alt="#">
+                                    <img src="{{ get_image($product->image) }}" alt="{{ product_slug($product->slug) }}">
                                 </div>
                                 <div class="content pt-10">
-                                    <h5><a href="shop-product-detail.html">Chen Cardigan</a></h5>
-                                    <p class="price mb-0 mt-5">$99.50</p>
-                                    <div class="product-rate">
-                                        <div class="product-rating" style="width:90%"></div>
-                                    </div>
+                                    <h5><a href="{{ product_slug($product->slug) }}">Chen Cardigan</a></h5>
+                                    @include('site.pages.inc.product_price', ['pro'=>$product])
                                 </div>
                             </div>
-                            <div class="single-post clearfix">
-                                <div class="image">
-                                    <img src="assets/imgs/shop/thumbnail-4.jpg" alt="#">
-                                </div>
-                                <div class="content pt-10">
-                                    <h6><a href="shop-product-detail.html">Chen Sweater</a></h6>
-                                    <p class="price mb-0 mt-5">$89.50</p>
-                                    <div class="product-rate">
-                                        <div class="product-rating" style="width:80%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="single-post clearfix">
-                                <div class="image">
-                                    <img src="assets/imgs/shop/thumbnail-5.jpg" alt="#">
-                                </div>
-                                <div class="content pt-10">
-                                    <h6><a href="shop-product-detail.html">Colorful Jacket</a></h6>
-                                    <p class="price mb-0 mt-5">$25</p>
-                                    <div class="product-rate">
-                                        <div class="product-rating" style="width:60%"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforeach
+
                         </div>
                     </div>
                 </div>

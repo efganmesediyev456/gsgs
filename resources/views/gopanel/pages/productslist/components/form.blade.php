@@ -65,6 +65,10 @@
            <input  type="text" class="form-control" name="sku"  placeholder="" value="{{$item->sku}}">
        </div>
        <div class="mb-3 col-lg">
+           <label for="category-name" class="form-label">Məhsul Stock miqdarı</label>
+           <input  type="text" class="form-control" name="stock_count"  placeholder="" value="{{$item->stock_count}}">
+       </div>
+       <div class="mb-3 col-lg">
            <label for="categories" class="form-label">Kateqoriyalar</label>
            <select name="categories[]" id="categories" class="form-control select2" multiple>
                @foreach($categories as $category)
